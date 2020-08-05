@@ -1,6 +1,6 @@
-package org.jetbrains.plugins.template.services
+package com.github.zwilias.intellijtqformat.services
 
-import org.jetbrains.plugins.template.MyBundle
+import com.github.zwilias.intellijtqformat.MyBundle
 
 class MyApplicationService {
 
