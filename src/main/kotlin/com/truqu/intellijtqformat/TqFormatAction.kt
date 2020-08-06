@@ -14,10 +14,10 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import java.io.OutputStreamWriter
 import org.intellij.erlang.ErlangFileType
 import org.intellij.erlang.jps.model.JpsErlangSdkType
 import org.intellij.erlang.sdk.ErlangSdkType
-import java.io.OutputStreamWriter
 
 class TqFormatAction : AnAction() {
     override fun update(e: AnActionEvent) {
