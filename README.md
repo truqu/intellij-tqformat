@@ -4,22 +4,12 @@
 [![Version](https://img.shields.io/jetbrains/plugin/v/com.truqu.intellijtqformat.svg)](https://plugins.jetbrains.com/plugin/com.truqu.intellijtqformat)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/com.truqu.intellijtqformat.svg)](https://plugins.jetbrains.com/plugin/com.truqu.intellijtqformat)
 
-## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [x] Verify the [pluginGroup](/gradle.properties), [plugin ID](/src/main/resources/META-INF/plugin.xml) and [sources package](/src/main/kotlin).
-- [x] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html).
-- [ ] [Publish a plugin manually](https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/publishing_plugin.html) for the first time.
-- [x] Set the Plugin ID in the above README badges.
-- [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html).
-- [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
-
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+The `intellij-tqformat` plugin allows configuring [tqformat](https://github.com/truqu/tqformat) as an (external) code formatter for Erlang code.
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be
-extracted by the [Gradle](/build.gradle.kts) during the build process.
+In order to use, get the escript version of `tqformat`. Select a (compatible) Erlang SDK in IntelliJ, and select the correct path to the `tqformat` escript in your project settings.
 
-To keep everything working, do not remove `<!-- ... -->` sections. 
+Format-on-save is available as a setting as well.  
 <!-- Plugin description end -->
 
 ## Installation
