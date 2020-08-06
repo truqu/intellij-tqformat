@@ -9,8 +9,8 @@
     <depends>org.jetbrains.erlang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectConfigurable parentId="tools" instance="com.truqu.intellijtqformat.MyConfigurable"
-                             id="com.truqu.intellijtqformat.MyConfigurable" displayName="TQFormat"
+        <projectConfigurable parentId="tools" instance="com.truqu.intellijtqformat.TqFormatConfiguration"
+                             id="com.truqu.intellijtqformat.TqFormatConfiguration" displayName="TQFormat"
                              nonDefaultProject="true"/>
     </extensions>
     <project-components>
