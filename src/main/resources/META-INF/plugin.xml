@@ -1,19 +1,28 @@
 <idea-plugin>
-    <id>com.github.zwilias.intellijtqformat</id>
+    <id>com.truqu.intellijtqformat</id>
     <name>intellij-tqformat</name>
-    <vendor>zwilias</vendor>
+    <vendor>truqu</vendor>
 
     <!-- Product and plugin compatibility requirements -->
     <!-- https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.erlang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.zwilias.intellijtqformat.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.zwilias.intellijtqformat.services.MyProjectService"/>
+        <projectConfigurable parentId="tools" instance="com.truqu.intellijtqformat.MyConfigurable"
+                             id="com.truqu.intellijtqformat.MyConfigurable" displayName="TQFormat"
+                             nonDefaultProject="true"/>
     </extensions>
-
-    <projectListeners>
-        <listener class="com.github.zwilias.intellijtqformat.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </projectListeners>
+    <project-components>
+        <component>
+            <implementation-class>com.truqu.intellijtqformat.TqFormatOnSaveComponent</implementation-class>
+        </component>
+    </project-components>
+    <actions>
+        <action id="TQ.Format"
+                class="com.truqu.intellijtqformat.TqFormatAction"
+                text="Run tqformat on current file">
+            <add-to-group group-id="CodeMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>
