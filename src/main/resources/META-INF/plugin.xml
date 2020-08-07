@@ -18,11 +18,6 @@
                   topic="com.intellij.openapi.fileEditor.FileDocumentManagerListener"
                   />
     </applicationListeners>
-<!--    <project-components>-->
-<!--        <component>-->
-<!--            <implementation-class>com.truqu.intellijtqformat.TqFormatOnSaveComponent</implementation-class>-->
-<!--        </component>-->
-<!--    </project-components>-->
     <actions>
         <action id="TQ.Format"
                 class="com.truqu.intellijtqformat.TqFormatAction"
