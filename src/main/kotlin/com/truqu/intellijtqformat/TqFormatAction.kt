@@ -1,23 +1,24 @@
 package com.truqu.intellijtqformat
 
-import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.execution.process.ProcessOutput
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.application.invokeLater
+import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import java.io.OutputStreamWriter
 import org.intellij.erlang.ErlangFileType
 import org.intellij.erlang.jps.model.JpsErlangSdkType
 import org.intellij.erlang.sdk.ErlangSdkType
+import org.jetbrains.concurrency.runAsync
 
 class TqFormatAction : AnAction() {
     override fun update(e: AnActionEvent) {
@@ -62,47 +63,38 @@ private fun validatedFile(e: AnActionEvent): VirtualFile? {
 
 fun formatDocument(project: Project, document: Document) {
     val eScriptPath = getEscriptPath(project) ?: return
+    val tqFormatPath = TqFormatConfiguration(project).tqformatPath
+    val handler = createHandler(eScriptPath, tqFormatPath, document.text)
 
-    val result = ProgressManager
-        .getInstance()
-        .runProcessWithProgressSynchronously<ProcessOutput, ExecutionException>(
-            {
-                val cli = GeneralCommandLine(eScriptPath)
-                    .withParameters(TqFormatConfiguration(project).tqformatPath, "-")
-
-                val process = cli.createProcess()
-                val stdInStream = process.outputStream
-                val writer = OutputStreamWriter(stdInStream, Charsets.UTF_8)
-                writer.write(document.text)
-                writer.flush()
-                writer.close()
-                CapturingProcessHandler(process, Charsets.UTF_8, cli.commandLineString).runProcess()
-            },
-            "Running TQFormat",
-            true,
-            project
-        )
-
-    if (!result.isCancelled && result.exitCode == 0) {
-        val formatted = result.stdout
-        val source = document.text
-
-        if (source != formatted) {
-            CommandProcessor.getInstance().executeCommand(
-                project,
-                {
-                    ApplicationManager.getApplication().runWriteAction {
-                        document.setText(formatted)
+    invokeLater {
+        runAsync { handler.runProcess() }
+            .then { done: ProcessOutput ->
+                if (!done.isCancelled && done.exitCode == 0) {
+                    runInEdt {
+                        CommandProcessor.getInstance().executeCommand(
+                            project,
+                            { WriteAction.run<Throwable> { document.setText(done.stdout) } },
+                            "Run tqformat on current file",
+                            null,
+                            document
+                        )
                     }
-                },
-                "Run elm-format on current file",
-                null,
-                document
-            )
-        }
-    } else {
-        error(result)
+                }
+            }
     }
+}
+
+private fun createHandler(eScriptPath: String, tqFormatPath: String, stdIn: String): CapturingProcessHandler {
+    val cli = GeneralCommandLine(eScriptPath)
+        .withParameters(tqFormatPath, "-")
+
+    val process = cli.createProcess()
+    val stdInStream = process.outputStream
+    val writer = OutputStreamWriter(stdInStream, Charsets.UTF_8)
+    writer.write(stdIn)
+    writer.flush()
+    writer.close()
+    return CapturingProcessHandler(process, Charsets.UTF_8, cli.commandLineString)
 }
 
 private fun getEscriptPath(project: Project): String? {
