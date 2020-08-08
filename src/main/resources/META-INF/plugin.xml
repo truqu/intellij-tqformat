@@ -13,11 +13,11 @@
                              id="com.truqu.intellijtqformat.TqFormatConfiguration" displayName="TQFormat"
                              nonDefaultProject="true"/>
     </extensions>
-    <applicationListeners>
+    <projectListeners>
         <listener class="com.truqu.intellijtqformat.TqFormatOnSaveListener"
                   topic="com.intellij.openapi.fileEditor.FileDocumentManagerListener"
                   />
-    </applicationListeners>
+    </projectListeners>
     <actions>
         <action id="TQ.Format"
                 class="com.truqu.intellijtqformat.TqFormatAction"
