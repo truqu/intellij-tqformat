@@ -37,6 +37,11 @@ class TqFormatConfiguration(private val project: Project) : Configurable {
         return panel {
             row("Executable") { tqFormatPathPicker() }
             row { checkBox("Format on save", this@TqFormatConfiguration::onSaveChecked) }
+            commentRow(
+                """
+                    In order for formatting to work, you must have an Erlang SDK selected.
+                """.trimIndent()
+            )
         }
     }
 

@@ -15,7 +15,7 @@ import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.runAsync
 
 fun formatDocument(project: Project, document: Document): Promise<Unit>? {
-    val eScriptPath = getEscriptPath(project) ?: return null
+    val eScriptPath = getEScriptPath(project) ?: return null
     val tqFormatPath = TqFormatConfiguration(project).tqformatPath
     val handler = createHandler(eScriptPath, tqFormatPath, document.text)
 
@@ -48,7 +48,7 @@ private fun createHandler(eScriptPath: String, tqFormatPath: String, stdIn: Stri
     return CapturingProcessHandler(process, Charsets.UTF_8, cli.commandLineString)
 }
 
-private fun getEscriptPath(project: Project): String? {
+fun getEScriptPath(project: Project): String? {
     val sdkHome = ErlangSdkType.getSdkPath(project) ?: return null
     return JpsErlangSdkType.getScriptInterpreterExecutable(sdkHome).absolutePath
 }
