@@ -6,6 +6,7 @@ import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.layout.Row
+import com.intellij.ui.layout.applyToComponent
 import com.intellij.ui.layout.panel
 import javax.swing.JComponent
 import javax.swing.event.DocumentEvent
@@ -33,17 +34,23 @@ class TqFormatConfiguration(private val project: Project) : Configurable {
         properties.setValue(V_ON_SAVE, onSaveChecked)
     }
 
-    override fun createComponent(): JComponent? {
-        return panel {
+    override fun createComponent(): JComponent? =
+        panel {
             row("Executable") { tqFormatPathPicker() }
-            row { checkBox("Format on save", this@TqFormatConfiguration::onSaveChecked) }
+            row {
+                checkBox("Format on save", this@TqFormatConfiguration::onSaveChecked)
+                    .applyToComponent {
+                        this.addChangeListener {
+                            this@TqFormatConfiguration.onSaveChecked = this.isSelected
+                        }
+                    }
+            }
             commentRow(
                 """
                     In order for formatting to work, you must have an Erlang SDK selected.
                 """.trimIndent()
             )
         }
-    }
 
     private fun Row.tqFormatPathPicker() {
         textFieldWithBrowseButton(
