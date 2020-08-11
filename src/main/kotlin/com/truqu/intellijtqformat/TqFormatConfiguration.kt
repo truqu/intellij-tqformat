@@ -1,74 +1,75 @@
 package com.truqu.intellijtqformat
 
-import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
-import com.intellij.ui.DocumentAdapter
-import com.intellij.ui.layout.Row
-import com.intellij.ui.layout.applyToComponent
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.layout.panel
 import javax.swing.JComponent
-import javax.swing.event.DocumentEvent
-
-private const val V_PATH = "com.truqu.tqformat.path"
-private const val V_ON_SAVE = "com.truqu.tqformat.on_save"
+import kotlin.reflect.KProperty
 
 class TqFormatConfiguration(private val project: Project) : Configurable {
-    private val properties: PropertiesComponent = PropertiesComponent.getInstance(project)
+    private val settings = TqFormatSettings(project)
 
-    private var tqformatPathInput: String = tqformatPath
-    private var onSaveChecked: Boolean = onSaveEnabled
+    private val tqFormatPathField = TextFieldWithBrowseButton().apply {
+        addBrowseFolderListener(
+            "Select path",
+            "Select the tqformat escript",
+            project,
+            FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor()
+        )
+    }
+    private var tqformatPathInput: String by PathSelectorDelegate(tqFormatPathField)
 
-    val tqformatPath: String
-        get() = properties.getValue(V_PATH, "")
-    val onSaveEnabled: Boolean
-        get() = properties.getBoolean(V_ON_SAVE, false)
+    private val onSaveCheckbox = JBCheckBox("Format on save")
+    private var onSaveChecked: Boolean by CheckboxDelegate(onSaveCheckbox)
 
-    override fun isModified(): Boolean = tqformatPathInput != tqformatPath || onSaveChecked != onSaveEnabled
+    override fun isModified(): Boolean = tqformatPathInput != settings.path || onSaveChecked != settings.onSave
+
+    override fun reset() {
+        tqformatPathInput = settings.path
+        onSaveChecked = settings.onSave
+    }
 
     override fun getDisplayName(): String = "TQFormat"
 
     override fun apply() {
-        properties.setValue(V_PATH, tqformatPathInput)
-        properties.setValue(V_ON_SAVE, onSaveChecked)
+        settings.path = tqformatPathInput
+        settings.onSave = onSaveChecked
+        settings.persist()
     }
 
     override fun createComponent(): JComponent? =
         panel {
-            row("Executable") { tqFormatPathPicker() }
+            if (getEScriptPath(project) == null) {
+                commentRow(
+                    """
+                        You do not have an Erlang SDK configured for this project.<br>
+                        The TQFormat escript is invoked using the selected Erlang SDK, which means you
+                        <strong>must</strong> select an Erlang SDK in the Project Structure.
+                    """.trimIndent()
+                )
+            }
+            row("Path to tqformat executable") { tqFormatPathField() }
             row {
-                checkBox("Format on save", this@TqFormatConfiguration::onSaveChecked)
-                    .applyToComponent {
-                        this.addChangeListener {
-                            this@TqFormatConfiguration.onSaveChecked = this.isSelected
-                        }
-                    }
+                onSaveCheckbox().comment("Format all Erlang files when persisting to disk")
             }
-            commentRow(
-                """
-                    In order for formatting to work, you must have an Erlang SDK selected.
-                """.trimIndent()
-            )
         }
+}
 
-    private fun Row.tqFormatPathPicker() {
-        textFieldWithBrowseButton(
-            this@TqFormatConfiguration::tqformatPathInput,
-            "Path to TQFormat executable",
-            project,
-            FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor(),
-            {
-                this@TqFormatConfiguration.tqformatPathInput = it.path
-                it.path
-            }
-        ).apply {
-            this.component.childComponent.document.addDocumentListener(object : DocumentAdapter() {
-                override fun textChanged(e: DocumentEvent) {
-                    this@TqFormatConfiguration.tqformatPathInput = this@apply.component.childComponent.text
-                    this@TqFormatConfiguration.tqformatPathInput
-                }
-            })
-        }
+private class PathSelectorDelegate(private val pathSelector: TextFieldWithBrowseButton) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): String = pathSelector.text
+
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
+        pathSelector.text = value
+    }
+}
+
+private class CheckboxDelegate(private val checkbox: JBCheckBox) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean = checkbox.isSelected
+
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) {
+        checkbox.isSelected = value
     }
 }

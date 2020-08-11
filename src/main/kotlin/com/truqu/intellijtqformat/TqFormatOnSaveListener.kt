@@ -16,7 +16,7 @@ class TqFormatOnSaveListener(private val project: Project) : FileDocumentManager
         }
     }
     private fun shouldRunOn(document: Document): Boolean {
-        return TqFormatConfiguration(project).onSaveEnabled &&
+        return TqFormatSettings(project).onSave &&
             isValidPsiDocument(document) &&
             isValidErlangFile(document)
     }

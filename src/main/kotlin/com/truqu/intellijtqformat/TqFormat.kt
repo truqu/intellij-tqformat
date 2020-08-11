@@ -16,7 +16,7 @@ import org.jetbrains.concurrency.runAsync
 
 fun formatDocument(project: Project, document: Document): Promise<Unit>? {
     val eScriptPath = getEScriptPath(project) ?: return null
-    val tqFormatPath = TqFormatConfiguration(project).tqformatPath
+    val tqFormatPath = TqFormatSettings(project).path
     val handler = createHandler(eScriptPath, tqFormatPath, document.text)
 
     return runAsync { handler.runProcess() }
