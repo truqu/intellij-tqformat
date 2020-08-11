@@ -3,6 +3,18 @@
 # intellij-tqformat Changelog
 
 ## [Unreleased]
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+## [0.0.6]
 ### Changed
 
 - Configuration screen now shows the version of the selected `tqformat` binary (requires `tqformat@0.1.2` or later)
