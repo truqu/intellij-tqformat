@@ -3,17 +3,10 @@
 # intellij-tqformat Changelog
 
 ## [Unreleased]
-### Added
-
 ### Changed
 
-### Deprecated
+Configuration screen now shows the version of the selected `tqformat` binary (requires `tqformat@0.1.2` or later), and only shows warning about selecting an Erlang SDK if no Erlang SDK is currently selected.
 
-### Removed
-
-### Fixed
-
-### Security
 ## [0.0.5]
 ### Added
 
